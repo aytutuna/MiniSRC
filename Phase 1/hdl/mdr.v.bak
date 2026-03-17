@@ -1,0 +1,25 @@
+`timescale 1ns/1ps
+
+// MDR = Memory Data Register.
+// Read=1: load from Mdatain (memory -> MDR)
+// Read=0: load from bus (bus -> MDR), used for stores in later phases.
+module mdr(
+    input         clk,
+    input         clr,
+    input         en,
+    input         Read,
+    input  [31:0] bus_in,
+    input  [31:0] Mdatain,
+    output reg [31:0] q
+);
+    // Simple 2-to-1 mux:
+    // If Read=1, MDR takes Mdatain.
+    // If Read=0, MDR takes bus_in.
+    wire [31:0] d;
+    assign d = (Read == 1'b1) ? Mdatain : bus_in;
+
+    always @(posedge clk) begin
+        if (clr) q <= 32'b0;
+        else if (en) q <= d;
+    end
+endmodule

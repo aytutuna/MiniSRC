@@ -1,0 +1,16 @@
+`timescale 1ns/1ps
+
+// Simple 32-bit register with enable and synchronous clear.
+// - On rising clock: if clr then q=0, else if en then q=d.
+module reg32(
+    input        clk,
+    input        clr,
+    input        en,
+    input  [31:0] d,
+    output reg [31:0] q
+);
+    always @(posedge clk) begin
+        if (clr) q <= 32'b0;
+        else if (en) q <= d;
+    end
+endmodule

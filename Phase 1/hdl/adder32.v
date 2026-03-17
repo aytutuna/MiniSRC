@@ -1,0 +1,30 @@
+`timescale 1ns/1ps
+
+// 32-bit ripple-carry adder
+module adder32(
+    input  [31:0] a,
+    input  [31:0] b,
+    input         cin,
+    output [31:0] sum,
+    output        cout
+);
+    reg [31:0] s;
+    reg c;
+    integer i;
+
+    always @* begin
+        s = 32'b0;
+        c = cin;
+
+        // Full adder per bit
+        // sum = a ^ b ^ c
+        // carry = (a&b) | (c&(a^b))
+        for (i = 0; i < 32; i = i + 1) begin
+            s[i] = a[i] ^ b[i] ^ c;
+            c = (a[i] & b[i]) | (c & (a[i] ^ b[i]));
+        end
+    end
+
+    assign sum = s;
+    assign cout = c;
+endmodule

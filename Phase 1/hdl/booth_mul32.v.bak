@@ -1,0 +1,57 @@
+`timescale 1ns/1ps
+
+// Booth multiplier (radix-4 / bit-pair recoding).
+// Signed 32x32 -> signed 64-bit.
+// Beginner view:
+// - Look at 3 bits of the multiplier at a time (bits)
+// - Choose a partial product: 0, +A, +2A, -2A, -A
+// - Shift it and add into the running product
+// NOTE: '+' and '-' are allowed inside MUL/DIV modules by the lab rules.
+module booth_mul32(
+    input  [31:0] a,
+    input  [31:0] b,
+    output [63:0] p
+);
+    reg signed [63:0] product;
+    reg signed [63:0] multiplicand;
+    reg [32:0] multiplier_ext;
+    reg [2:0] bits;
+    reg [32:0] b_shift;
+    reg signed [63:0] partial;
+    integer i;
+    integer sh;
+
+    always @* begin
+        // Sign-extend A to 64-bit
+        multiplicand = {{32{a[31]}}, a};
+
+        // Extend B with one extra 0 bit at the right (Booth needs the "previous" bit)
+        multiplier_ext = {b, 1'b0};
+
+        // Running sum
+        product = 64'sd0;
+
+        for (i = 0; i < 16; i = i + 1) begin
+            sh = (i << 1);
+            // Quartus 13.1 is picky about variable bit indexing inside concatenations.
+            // Shift first, then take a fixed slice.
+            b_shift = (multiplier_ext >> sh);
+            bits = b_shift[2:0];
+
+            // Pick the partial product from Booth table
+            case (bits)
+                3'b000, 3'b111: partial = 64'sd0;
+                3'b001, 3'b010: partial = multiplicand;
+                3'b011:         partial = (multiplicand <<< 1);
+                3'b100:         partial = -(multiplicand <<< 1);
+                3'b101, 3'b110: partial = -multiplicand;
+                default:        partial = 64'sd0;
+            endcase
+
+            // Shift the partial product and accumulate
+            product = product + (partial <<< sh);
+        end
+    end
+
+    assign p = product;
+endmodule

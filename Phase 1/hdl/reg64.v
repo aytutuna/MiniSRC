@@ -1,0 +1,14 @@
+`timescale 1ns/1ps
+
+module reg64(
+    input         clk,
+    input         clr,
+    input         en,
+    input  [63:0] d,
+    output reg [63:0] q
+);
+    always @(posedge clk) begin
+        if (clr) q <= 64'b0;
+        else if (en) q <= d;
+    end
+endmodule
