@@ -9,20 +9,10 @@ Standalone Phase 3 Mini SRC CPU implementation with a finite-state control unit 
   - New `control_unit.v` implementing the Phase 3 control FSM
   - New `mini_src_cpu.v` top-level tying the control unit to the datapath
 - `tb/phase3tb.v`
-  - Full-program functional simulation for the Phase 3 assignment program
-- `run_phase3.ps1`
-  - ModelSim wrapper for compiling and running the Phase 3 testbench
+  - Full-program functional simulation for a small reference program
 
 ## Notes
 
-- The control unit follows the Phase 3 fetch sequence and instruction micro-steps from the lab handout.
-- The testbench initializes memory locations `0x89` and `0xA3`, loads the assignment program starting at address `0`, places subroutine `subA` at address `0xB2`, then checks the final register, `HI`, `LO`, `MAR`, `MDR`, and RAM values required by the demo guideline.
-- `jal` is encoded so the link register is `R12`, matching the Phase 2 and Phase 3 lab material.
-
-## Running
-
-From the `Phase 3` folder:
-
-```powershell
-./run_phase3.ps1
-```
+- The control unit implements a basic fetch/decode/execute FSM for the supported instruction set.
+- The testbench is a full-program simulation: it initializes a few RAM locations, loads a small program image, runs it, then checks final register/`HI`/`LO`/`MAR`/`MDR` and RAM state.
+- `jal` uses `R12` as the link register in this project.
